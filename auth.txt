@@ -1,0 +1,6 @@
+> \App\Models\User::create([
+.   'name' => 'Admin',
+.   'email' => 'admin@outfitly.test',
+.   'password' => \Hash::make('admin12345'),
+.   'role' => 'admin',
+. ]);

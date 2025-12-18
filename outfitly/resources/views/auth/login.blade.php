@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.storefront')
 @section('title', 'Login')
 
 @php($hideSearch = true)

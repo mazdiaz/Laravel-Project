@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.storefront')
 @section('title', 'Register')
 
 @php($hideSearch = true)
@@ -33,8 +33,13 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Role</label>
-            <input class="form-control" type="email" name="email" value="{{ old('email') }}" required>
+            <label class="form-label">Daftar sebagai</label>
+            <select class="form-select" name="role" required>
+              <option value="" disabled {{ old('role') ? '' : 'selected' }}>Pilih role...</option>
+              <option value="customer" {{ old('role', 'customer') === 'customer' ? 'selected' : '' }}>Customer</option>
+              <option value="seller"   {{ old('role') === 'seller' ? 'selected' : '' }}>Seller</option>
+            </select>
+            <div class="text-muted small mt-1">Pilih apakah kamu ingin belanja (customer) atau jualan (seller).</div>
           </div>
 
           <div class="row g-2 mb-3">

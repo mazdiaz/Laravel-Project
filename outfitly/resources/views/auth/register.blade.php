@@ -32,6 +32,11 @@
             <input class="form-control" type="email" name="email" value="{{ old('email') }}" required>
           </div>
 
+          <div class="mb-3">
+            <label class="form-label">Role</label>
+            <input class="form-control" type="email" name="email" value="{{ old('email') }}" required>
+          </div>
+
           <div class="row g-2 mb-3">
             <div class="col-md-6">
               <label class="form-label">Password</label>

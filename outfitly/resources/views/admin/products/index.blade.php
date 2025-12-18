@@ -1,100 +1,122 @@
-<!doctype html>
-<html lang="id">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Manajemen Produk</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+@extends('layouts.admin')
+
+@section('title', 'Manajemen Produk')
+
+@section('content')
 @php use Illuminate\Support\Facades\Storage; @endphp
 
-<div class="container py-5">
-  <h2 class="fw-bold mb-3">Manajemen Produk (Semua Penjual)</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold m-0">Manajemen Produk</h2>
+    <span class="text-muted">Semua Penjual</span>
+</div>
 
-  @if (session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-  @endif
-
-  <form method="GET" class="card shadow-sm mb-3">
-    <div class="card-body">
-      <div class="row g-2">
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body bg-white rounded">
+    <form method="GET" action="{{ route('admin.products.index') }}">
+      <div class="row g-2 align-items-end">
         <div class="col-md-4">
-          <label class="form-label">Search</label>
-          <input class="form-control" name="search" value="{{ request('search') }}" placeholder="name/slug">
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">Seller</label>
-          <input class="form-control" name="seller" value="{{ request('seller') }}" placeholder="name/email">
-        </div>
-        <div class="col-md-2">
-          <label class="form-label">Status</label>
-          <select class="form-select" name="status">
-            <option value="">(all)</option>
-            <option value="active" @selected(request('status')==='active')>active</option>
-            <option value="inactive" @selected(request('status')==='inactive')>inactive</option>
-          </select>
-        </div>
-        <div class="col-md-3 d-flex align-items-end gap-2">
-          <button class="btn btn-primary w-100" type="submit">Filter</button>
-          <a class="btn btn-outline-secondary w-100" href="{{ route('admin.products.index') }}">Reset</a>
-        </div>
-      </div>
-    </div>
-  </form>
-
-  <div class="row g-3">
-    @forelse ($products as $p)
-      <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-          <img class="card-img-top" style="height:200px; object-fit:cover;"
-               src="{{ $p->image_path ? Storage::url($p->image_path) : 'https://via.placeholder.com/600x400' }}">
-
-          <div class="card-body">
-            <div class="d-flex justify-content-between">
-              <div class="fw-bold">{{ $p->name }}</div>
-              <span class="badge text-bg-{{ $p->status==='active' ? 'success' : 'secondary' }}">
-                {{ $p->status }}
-              </span>
-            </div>
-
-            <div class="text-muted small mt-1">
-              Seller: {{ $p->seller->name ?? '-' }}
-            </div>
-
-            <div class="mt-2">
-              <div>Rp {{ number_format($p->price, 0, ',', '.') }}</div>
-              <div class="small text-muted">Stock: {{ $p->stock }}</div>
-            </div>
-
-            <div class="mt-3 d-flex gap-2">
-              <form method="POST" action="{{ route('admin.products.toggle', $p->id) }}">
-                @csrf
-                <button class="btn btn-sm btn-outline-primary" type="submit">
-                  {{ $p->status==='active' ? 'Deactivate' : 'Activate' }}
-                </button>
-              </form>
-
-              <form method="POST" action="{{ route('admin.products.destroy', $p->id) }}"
-                    onsubmit="return confirm('Hapus produk ini?')">
-                @csrf
-                @method('DELETE')
-                <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
-              </form>
-            </div>
-
+          <label class="form-label small text-muted">Cari Produk</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control border-start-0" name="search" 
+                   value="{{ request('search') }}" placeholder="Nama atau slug...">
           </div>
         </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Status</label>
+          <select class="form-select" name="status">
+            <option value="">Semua Status</option>
+            <option value="active" @selected(request('status')==='active')>Active Only</option>
+            <option value="inactive" @selected(request('status')==='inactive')>Inactive Only</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">Filter</button>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="d-grid gap-2">
+                @if(request()->anyFilled(['search', 'seller', 'status']))
+                    <a href="{{ route('admin.products.index') }}" class="btn btn-danger">Reset</a>
+                @endif
+            </div>
+        </div>
       </div>
-    @empty
-      <div class="text-muted">Tidak ada produk.</div>
-    @endforelse
-  </div>
-
-  <div class="mt-3">
-    {{ $products->links() }}
+    </form>
   </div>
 </div>
 
-</body>
-</html>
+<div class="row g-4">
+  @forelse ($products as $p)
+    <div class="col-md-6 col-lg-4 col-xl-3">
+      <div class="card border-0 shadow-sm h-100 product-card">
+        <div class="position-relative">
+            <img src="{{ $p->image_path ? Storage::url($p->image_path) : 'https://via.placeholder.com/600x400?text=No+Image' }}" 
+                 class="card-img-top" 
+                 style="height: 200px; object-fit: cover;" 
+                 alt="{{ $p->name }}">
+            
+            <div class="position-absolute top-0 end-0 p-2">
+                @if($p->status === 'active')
+                    <span class="badge bg-success shadow-sm">Active</span>
+                @else
+                    <span class="badge bg-secondary shadow-sm">Inactive</span>
+                @endif
+            </div>
+        </div>
+
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title fw-bold text-truncate" title="{{ $p->name }}">{{ $p->name }}</h5>
+          
+          <div class="mb-2 text-primary fw-bold">
+            Rp {{ number_format($p->price, 0, ',', '.') }}
+          </div>
+
+          <div class="small text-muted mb-3 border-top pt-2 mt-auto">
+            <div class="d-flex justify-content-between mb-1">
+                <span><i class="bi bi-shop me-1"></i> Seller:</span>
+                <span class="fw-semibold text-truncate" style="max-width: 100px;">{{ $p->seller->name ?? '-' }}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+                <span><i class="bi bi-box-seam me-1"></i> Stok:</span>
+                <span class="fw-semibold">{{ $p->stock }} item</span>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+             <form method="POST" action="{{ route('admin.products.toggle', $p->id) }}">
+                @csrf
+                <button class="btn btn-sm w-100 {{ $p->status==='active' ? 'btn-outline-secondary' : 'btn-outline-success' }}" type="submit">
+                   {{ $p->status==='active' ? 'Nonaktifkan' : 'Aktifkan Produk' }}
+                </button>
+             </form>
+             
+             <form method="POST" action="{{ route('admin.products.destroy', $p->id) }}" 
+                   onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini secara permanen?');">
+                @csrf
+                @method('DELETE')
+                <button class="btn btn-sm btn-outline-danger w-100" type="submit">
+                    <i class="bi bi-trash"></i> Hapus
+                </button>
+             </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  @empty
+    <div class="col-12">
+        <div class="card border-0 shadow-sm py-5 text-center">
+            <div class="text-muted">
+                <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+                Tidak ada produk yang ditemukan sesuai filter.
+            </div>
+        </div>
+    </div>
+  @endforelse
+</div>
+
+<div class="mt-4">
+  {{ $products->links() }}
+</div>
+@endsection

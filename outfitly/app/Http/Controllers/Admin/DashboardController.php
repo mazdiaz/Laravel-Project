@@ -15,20 +15,28 @@ class DashboardController extends Controller
         $start = Carbon::now()->startOfMonth();
         $end   = Carbon::now()->endOfMonth();
 
-        $usersCount   = User::count();
-        $productsCount = Product::count();
+        $usersCount     = User::count();
+        $productsCount  = Product::count();
         $activeProducts = Product::where('status', 'active')->count();
 
         $ordersThisMonth = Order::whereBetween('created_at', [$start, $end])->count();
+
         $revenueThisMonth = Order::whereBetween('created_at', [$start, $end])
-            ->where('status', '!=', 'cancelled')
+            ->where('status', 'completed') 
             ->sum('total_amount');
 
-        $latestOrders = Order::latest()->limit(5)->get();
+        $latestOrders = Order::with('buyer') 
+            ->latest()
+            ->limit(5)
+            ->get();
 
         return view('admin-dashboard', compact(
-            'usersCount','productsCount','activeProducts',
-            'ordersThisMonth','revenueThisMonth','latestOrders'
+            'usersCount',
+            'productsCount',
+            'activeProducts',
+            'ordersThisMonth',
+            'revenueThisMonth',
+            'latestOrders'
         ));
     }
 }

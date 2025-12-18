@@ -10,8 +10,10 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        // Mengambil produk dengan data seller untuk mencegah N+1 Query
         $q = Product::query()->with('seller')->latest();
 
+        // Filter Search (Nama Produk / Slug)
         if ($request->filled('search')) {
             $s = $request->string('search');
             $q->where(function ($x) use ($s) {
@@ -20,18 +22,12 @@ class ProductController extends Controller
             });
         }
 
+        // Filter Status
         if ($request->filled('status')) {
             $q->where('status', $request->string('status'));
         }
 
-        if ($request->filled('seller')) {
-            $seller = $request->string('seller');
-            $q->whereHas('seller', fn($x) =>
-                $x->where('name', 'like', "%{$seller}%")
-                  ->orWhere('email', 'like', "%{$seller}%")
-            );
-        }
-
+        // Pagination 12 item per halaman
         $products = $q->paginate(12)->withQueryString();
 
         return view('admin.products.index', compact('products'));
@@ -43,11 +39,12 @@ class ProductController extends Controller
             'status' => $product->status === 'active' ? 'inactive' : 'active',
         ]);
 
-        return back()->with('success', 'Status produk berhasil diubah.');
+        return back()->with('success', 'Status produk berhasil diperbarui.');
     }
 
     public function destroy(Product $product)
     {
+        
         $product->delete();
         return back()->with('success', 'Produk berhasil dihapus.');
     }

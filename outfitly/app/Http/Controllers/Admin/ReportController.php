@@ -12,7 +12,7 @@ class ReportController extends Controller
 {
     public function monthly(Request $request)
     {
-        // month format: YYYY-MM (example: 2025-12)
+        // month format: YYYY-MM
         $month = $request->input('month', now()->format('Y-m'));
 
         try {
@@ -24,37 +24,34 @@ class ReportController extends Controller
 
         $end = (clone $start)->endOfMonth();
 
-        $base = Order::query()
-            ->whereBetween('created_at', [$start, $end]);
+        $base = Order::query()->whereBetween('created_at', [$start, $end]);
 
-        // Summary
-        $totalOrders = (clone $base)->count();
+        // 1. Summary Cards
+        $totalOrders  = (clone $base)->count();
         $grossRevenue = (clone $base)->sum('total_amount');
+        $netRevenue   = (clone $base)->where('status', '!=', 'cancelled')->sum('total_amount');
 
-        // “Net-ish” (exclude cancelled)
-        $netRevenue = (clone $base)->where('status', '!=', 'cancelled')->sum('total_amount');
-
-        // Status breakdown
+        // 2. Breakdown Status
         $byStatus = (clone $base)
             ->select('status', DB::raw('COUNT(*) as orders'), DB::raw('SUM(total_amount) as revenue'))
             ->groupBy('status')
             ->orderBy('status')
             ->get();
 
-        // Top sellers
+        // 3. Top Sellers
         $topSellers = (clone $base)
             ->select('seller_id', DB::raw('COUNT(*) as orders'), DB::raw('SUM(total_amount) as revenue'))
-            ->with('seller:id,name,email')
+            ->with('seller:id,name,email') 
             ->groupBy('seller_id')
             ->orderByDesc('revenue')
             ->limit(10)
             ->get();
 
-        // Daily revenue
+        // 4. Daily Stats
         $daily = (clone $base)
             ->select(DB::raw('DATE(created_at) as day'), DB::raw('COUNT(*) as orders'), DB::raw('SUM(total_amount) as revenue'))
             ->groupBy(DB::raw('DATE(created_at)'))
-            ->orderBy('day')
+            ->orderBy('day', 'desc') 
             ->get();
 
         return view('admin.reports.monthly', compact(

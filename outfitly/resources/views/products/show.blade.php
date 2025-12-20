@@ -9,9 +9,11 @@
     <div class="card shadow-sm mt-3">
       <div class="row g-0">
         <div class="col-md-5">
+          <div class="zoom-container">
           <img class="img-fluid"
                src="{{ $product->image_path ? asset('storage/'.$product->image_path) : 'https://via.placeholder.com/600x400' }}"
                alt="{{ $product->name }}">
+          </div>
         </div>
         <div class="col-md-7">
           <div class="card-body">
@@ -107,4 +109,37 @@
       @endforeach
     @endif
   </div>
+    <style>
+.zoom-container {
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: zoom-in;
+}
+
+.zoom-image {
+  transition: transform 0.3s ease;
+  width: 100%;
+}
+
+.zoom-container:hover .zoom-image {
+  transform: scale(1.6);
+}
+</style>
+<script>
+const container = document.querySelector('.zoom-container');
+const image = document.querySelector('.zoom-image');
+
+if (container && image) {
+  container.addEventListener('mousemove', function (e) {
+    const rect = container.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    image.style.transformOrigin = `${x}% ${y}%`;
+  });
+
+  container.addEventListener('mouseleave', function () {
+    image.style.transformOrigin = 'center center';
+  });
+}
+</script>
 @endsection

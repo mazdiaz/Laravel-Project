@@ -1,94 +1,145 @@
-<!doctype html>
-<html lang="id">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Manajemen User</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+@extends('layouts.admin')
 
-<div class="container py-5">
-  <h2 class="fw-bold mb-3">Manajemen User</h2>
+@section('title', 'Manajemen User')
 
-  @if (session('success'))
+@section('content')
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold m-0">Manajemen User</h2>
+    {{-- TOMBOL TAMBAH USER BARU --}}
+    <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Tambah User
+    </a>
+</div>
+
+{{-- Pesan Error/Success --}}
+@if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
-  @endif
+@endif
+@if($errors->any())
+    <div class="alert alert-danger">{{ $errors->first() }}</div>
+@endif
 
-  <form method="GET" class="card shadow-sm mb-3">
-    <div class="card-body">
-      <div class="row g-2">
-        <div class="col-md-5">
-          <label class="form-label">Search</label>
-          <input class="form-control" name="search" value="{{ request('search') }}" placeholder="name/email">
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body bg-white rounded">
+    <form method="GET" action="{{ route('admin.users.index') }}">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label small text-muted">Pencarian</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control border-start-0" name="search" 
+                   value="{{ request('search') }}" placeholder="Nama atau email...">
+          </div>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Role</label>
+          <label class="form-label small text-muted">Role</label>
           <select class="form-select" name="role">
-            <option value="">(all)</option>
+            <option value="">Semua Role</option>
             @foreach (['customer','seller','admin'] as $r)
-              <option value="{{ $r }}" @selected(request('role')===$r)>{{ $r }}</option>
+              <option value="{{ $r }}" @selected(request('role')===$r)>{{ ucfirst($r) }}</option>
             @endforeach
           </select>
         </div>
-        <div class="col-md-2">
-          <label class="form-label">Active</label>
+        <div class="col-md-3">
+          <label class="form-label small text-muted">Status</label>
           <select class="form-select" name="active">
-            <option value="">(all)</option>
-            <option value="1" @selected(request('active')==='1')>active</option>
-            <option value="0" @selected(request('active')==='0')>suspended</option>
+            <option value="">Semua Status</option>
+            <option value="1" @selected(request('active')==='1')>Active Only</option>
+            <option value="0" @selected(request('active')==='0')>Suspended Only</option>
           </select>
         </div>
-        <div class="col-md-2 d-flex align-items-end gap-2">
-          <button class="btn btn-primary w-100" type="submit">Filter</button>
-          <a class="btn btn-outline-secondary w-100" href="{{ route('admin.users.index') }}">Reset</a>
+        <div class="col-md-2">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" type="submit">Filter</button>
+                @if(request()->anyFilled(['search', 'role', 'active']))
+                    <a href="{{ route('admin.users.index') }}" class="btn btn-sm btn-link text-decoration-none text-muted">Reset</a>
+                @endif
+            </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
+</div>
 
-  <div class="card shadow-sm">
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
     <div class="table-responsive">
-      <table class="table mb-0 align-middle">
-        <thead>
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light text-secondary">
           <tr>
-            <th style="width:80px;">ID</th>
-            <th>User</th>
-            <th style="width:120px;">Role</th>
-            <th style="width:140px;">Status</th>
-            <th style="width:140px;"></th>
+            <th class="ps-4" style="width:60px;">ID</th>
+            <th>Pengguna</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-end pe-4">Aksi</th>
           </tr>
         </thead>
         <tbody>
-          @foreach ($users as $u)
+          @forelse ($users as $u)
             <tr>
-              <td>#{{ $u->id }}</td>
+              <td class="ps-4 text-muted">#{{ $u->id }}</td>
               <td>
-                <div class="fw-semibold">{{ $u->name }}</div>
-                <div class="small text-muted">{{ $u->email }}</div>
+                <div class="d-flex align-items-center">
+                    <div class="avatar me-2 rounded-circle bg-primary text-white d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; font-weight: bold;">
+                        {{ substr($u->name, 0, 1) }}
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">{{ $u->name }}</div>
+                        <div class="small text-muted">{{ $u->email }}</div>
+                    </div>
+                </div>
               </td>
-              <td><span class="badge text-bg-secondary">{{ $u->role }}</span></td>
+              <td>
+                @php
+                    $roleColors = ['admin' => 'danger', 'seller' => 'info', 'customer' => 'secondary'];
+                    $color = $roleColors[$u->role] ?? 'secondary';
+                @endphp
+                <span class="badge bg-{{ $color }} bg-opacity-10 text-{{ $color }} px-3 py-2 rounded-pill">
+                    {{ ucfirst($u->role) }}
+                </span>
+              </td>
               <td>
                 @if ($u->is_active)
-                  <span class="badge text-bg-success">active</span>
+                  <span class="badge bg-success bg-opacity-10 text-success"><i class="bi bi-check-circle me-1"></i> Active</span>
                 @else
-                  <span class="badge text-bg-danger">suspended</span>
+                  <span class="badge bg-danger bg-opacity-10 text-danger"><i class="bi bi-x-circle me-1"></i> Suspended</span>
                 @endif
               </td>
-              <td>
-                <a class="btn btn-sm btn-primary" href="{{ route('admin.users.edit', $u->id) }}">Edit</a>
+              <td class="text-end pe-4">
+                <div class="d-flex justify-content-end gap-2">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.users.edit', $u->id) }}">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                    
+                    {{-- TOMBOL DELETE --}}
+                    @if(auth()->id() !== $u->id)
+                    <form action="{{ route('admin.users.destroy', $u->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini secara permanen? Data transaksi terkait mungkin akan error jika tidak dihandle.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                    @endif
+                </div>
               </td>
             </tr>
-          @endforeach
+          @empty
+            <tr>
+                <td colspan="5" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    Data user tidak ditemukan.
+                </td>
+            </tr>
+          @endforelse
         </tbody>
       </table>
     </div>
   </div>
-
-  <div class="mt-3">
+  @if($users->hasPages())
+  <div class="card-footer bg-white border-0 py-3">
     {{ $users->links() }}
   </div>
+  @endif
 </div>
-
-</body>
-</html>
+@endsection

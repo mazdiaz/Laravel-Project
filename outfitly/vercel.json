@@ -41,10 +41,7 @@
 
         "LOG_CHANNEL": "stderr",
         "CACHE_DRIVER": "array",
-        "SESSION_DRIVER": "cookie",
-        "SESSION_SECURE_COOKIE": "true",
-        "SESSION_SAME_SITE": "lax",
-        "SESSION_DOMAIN": "outfitly-three.vercel.app",
+        "SESSION_DRIVER": "array",
 
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",

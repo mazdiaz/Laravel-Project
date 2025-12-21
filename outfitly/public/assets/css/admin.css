@@ -53,7 +53,7 @@ a {
 }
 
 .active-menu {
-  background-color: var(--brand-color) !important; /* Orange Penuh */
+  background-color: var(--navy-color) !important; /* Orange Penuh */
   color: #fff !important; /* Hitam */
   box-shadow: 0 4px 10px rgba(255, 107, 61, 0.3);
   font-weight: bold;

@@ -83,7 +83,7 @@
           <div class="card-body text-center">
             <h5 class="card-title">Dress Wanita</h5>
             <p class="card-text text-muted">Rp324.000</p>
-            <a class="btn btn-outline-primary" href="{{ route('maintenance') }}">Lihat Detail</a>
+            <a class="btn btn-outline-primary" href="{{ route('login') }}">Lihat Detail</a>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@
           <div class="card-body text-center">
             <h5 class="card-title">Kemeja Pria</h5>
             <p class="card-text text-muted">Rp249.000</p>
-            <a class="btn btn-outline-primary" href="{{ route('maintenance') }}">Lihat Detail</a>
+            <a class="btn btn-outline-primary" href="{{ route('login') }}">Lihat Detail</a>
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@
           <div class="card-body text-center">
             <h5 class="card-title">Boots Unisex</h5>
             <p class="card-text text-muted">Rp2.310.000</p>
-            <a class="btn btn-outline-primary" href="{{ route('maintenance') }}">Lihat Detail</a>
+            <a class="btn btn-outline-primary" href="{{ route('login') }}">Lihat Detail</a>
           </div>
         </div>
       </div>

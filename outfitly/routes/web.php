@@ -22,10 +22,34 @@ use App\Http\Controllers\Seller\ReportController as SellerReportController;
 use App\Models\Order;
 use Carbon\Carbon;
 use App\Http\Controllers\Seller\StoreSettingsController;
+use Illuminate\Http\Request;
 
 
 
 Route::view('/', 'landing')->name('landing');
+
+// --- Debug helpers (safe to remove later) ---
+Route::middleware('web')->group(function () {
+    Route::get('/_debug/session', function (Request $request) {
+        $request->session()->put('debug_key', 'debug_value');
+        return response()->json([
+            'session_id' => $request->session()->getId(),
+            'has_debug_key' => $request->session()->has('debug_key'),
+            'cookie_name' => config('session.cookie'),
+            'cookie_value' => $request->cookie(config('session.cookie')),
+            'driver' => config('session.driver'),
+            'domain' => config('session.domain'),
+            'secure' => config('session.secure'),
+            'same_site' => config('session.same_site'),
+        ]);
+    })->name('debug.session');
+
+    Route::get('/_debug/csrf', function () {
+        return response()->json([
+            'csrf_token' => csrf_token(),
+        ]);
+    })->name('debug.csrf');
+});
 
 
 

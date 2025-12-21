@@ -21,14 +21,13 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required','confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-            'role' => ['required', 'in:customer,seller'],
         ]);
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => $data['role'],
+            'role' => 'customer',
         ]);
 
         Auth::login($user);

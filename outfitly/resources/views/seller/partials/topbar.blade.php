@@ -11,7 +11,7 @@
 
 <div class="topbar py-2">
   <div class="container-xl d-flex align-items-center gap-3">
-    <a class="brand text-decoration-none fs-4" href="{{ $sellerDashboardUrl }}">
+    <a class="brand text-decoration-none fs-4" href="{{ route('landing') }}">
       Outfit<span class="text-danger">ly</span>
     </a>
 

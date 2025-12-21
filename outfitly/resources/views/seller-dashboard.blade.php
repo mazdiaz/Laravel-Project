@@ -70,7 +70,9 @@
       <div class="fw-semibold" style="color:var(--navyText)">Penjualan Harian</div>
       <div class="text-muted small">Bulan terpilih</div>
     </div>
-    <div id="salesChart" class="chart-wrap"></div>
+    <div class="chart-wrap">
+      <canvas id="salesChart"></canvas>
+    </div>
   </div>
 
   <!-- Tables -->
@@ -146,3 +148,47 @@
     </div>
   </div>
 @endsection
+@push('scripts')
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const labels = @json($chartLabels ?? []);
+    const values = @json($chartValues ?? []);
+
+    const ctx = document.getElementById('salesChart');
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Penjualan (Rp)',
+          data: values,
+          tension: 0.35,
+          fill: true,
+          pointRadius: 2,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (v) => 'Rp ' + new Intl.NumberFormat('id-ID').format(v)
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => 'Rp ' + new Intl.NumberFormat('id-ID').format(ctx.raw)
+            }
+          }
+        }
+      }
+    });
+  </script>
+@endpush

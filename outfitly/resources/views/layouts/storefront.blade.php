@@ -36,6 +36,36 @@
     .btn-primary{ background:var(--cust); border-color:var(--cust); }
     .btn-outline-primary{ color:var(--cust); border-color:rgba(37,99,235,.35); }
     .btn-outline-primary:hover{ background:var(--cust); border-color:var(--cust); }
+
+    /*carousel*/
+  
+  .hero-full-image .carousel-item {
+    height: 70vh; /* Tinggi hero, sesuaikan (70vh = 70% layar) */
+  }
+
+  .hero-full-image img {
+    height: 70vh;
+    object-fit: cover; /* Gambar memenuhi tanpa distorsi */
+    object-position: center;
+    box-sizing: border-box;
+  }
+
+  /* Panah lebih besar & semi-transparan */
+  .carousel-control-prev-icon,
+  .carousel-control-next-icon {
+    width: 30px;
+    height: 30px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 30%;
+  }
+
+  /* Indicators lebih jelas */
+  .carousel-indicators [data-bs-target] {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+    
   </style>
 
   @stack('head')
